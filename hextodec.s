@@ -1,7 +1,7 @@
 # A MIPS Program that prints the corresponding decimal number 
 # of an hexadecimal number specified by user input
 .data
-str: .space 32
+str: .space 36
 error: .asciiz "Invalid hexadecimal number."
 
 .text
@@ -10,11 +10,14 @@ addi $s0, $zero, 0    	# Initialize $s0
 
 li $v0, 8 							# Read in hexadecimal number
 la $a0, str
-li $a1, 32							# of size 32 bits
+li $a1, 36							# of size 36 bits
 syscall
 
 li $v0, 4								# Print string in $a0
 la $a0, str
+syscall
+
+li $v0, 1								# Print string in $a0
 syscall
 
 la $s1, str
@@ -41,7 +44,7 @@ addi $t4, $zero, 1			# Set temporary variable to 1
 sub $t3, $zero, $t4			# Set temporary variable to -1
 bne $v0, $t3, valid			# Check whether $v0 is not equal to -1
 
-add $a0, $zero,  $t2		# Initialize values for function: hex_funct for the ascii range A - F
+add $a0, $zero,  $t2		# Initialize values for function: hex_funct for the ascii range a - f
 li $a1, 97
 li $a2, 103
 addi $t4, $zero, 10			# Set temporary variable to 10
@@ -58,15 +61,16 @@ li $v0, 10 							# Exit Program
 syscall
 
 valid: add $t0, $v0, $zero
-beq $t1,$zero, else
-sll $s0, $s0, 4
-else: add $s0, $s0, $t0
+bne $t1,$zero, else
+j both
+else: sll $s0, $s0, 4
+both: add $s0, $s0, $t0
 
 addi $t1, $t1, 1
 
 addi $s1, $s1, 1
 lbu $t2, 0($s1)
-beqz $t2, finish 				# Exit loop when next character in string is null
+beq $t2, $zero, finish 				# Exit loop when next character in string is null
 j loop
 
 finish:
