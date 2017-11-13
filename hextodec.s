@@ -17,9 +17,6 @@ li $v0, 4								# Print string in $a0
 la $a0, str
 syscall
 
-li $v0, 1								# Print string in $a0
-syscall
-
 la $s1, str
 lbu $t2, 0($s1)					# Load character at $a0
 addi $t1, $zero, 0			# initialize counter $t1 to zero
@@ -71,6 +68,8 @@ addi $t1, $t1, 1
 addi $s1, $s1, 1
 lbu $t2, 0($s1)
 beq $t2, $zero, finish 				# Exit loop when next character in string is null
+addi $t8, $zero, 10
+beq $t2, $t8, finish					# Exit loop when next character in string is enter
 j loop
 
 finish:
