@@ -3,6 +3,7 @@
 .data
 str: .space 36
 error: .asciiz "Invalid hexadecimal number."
+buffer: .space 36
 
 .text
 main:
@@ -18,8 +19,14 @@ la $a0, str
 syscall
 
 la $s1, str
-lbu $t2, 0($s1)					# Load character at $a0
+lbu $t2, 0($s1)					# Load character at $s1
 addi $t1, $zero, 0			# initialize counter $t1 to zero
+
+sp: addi $t7, $zero, 32			# Store 32 in $t7			
+bne $t2, $t7, loop					# If not space branch to loop
+addi $s1, $s1, 1
+lbu $t2, 0($s1)
+j sp
 
 loop: 
 add $a0, $zero,  $t2		# Initialize values for function: hex_funct for the ascii range 0 - 9
@@ -73,6 +80,7 @@ beq $t2, $t8, finish					# Exit loop when next character in string is enter
 j loop
 
 finish:
+
 li $v0, 1								# Print integer value
 add $a0, $s0, $zero			# in $s0
 syscall
@@ -88,7 +96,7 @@ syscall
 #
 # Pre: none
 # Post: $v0 contains the return value
-# Returns: the value of the hex or -1
+# Returns: the value of the hex, -1 if not valid
 #
 # Called by: main
 # Calls: none
