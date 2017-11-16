@@ -1,9 +1,9 @@
 # A MIPS Program that prints the corresponding decimal number 
 # of an hexadecimal number specified by user input
 .data
-str: .space 36
+str: .space 9
 error: .asciiz "Invalid hexadecimal number."
-buffer: .space 36
+buffer: .space 11
 
 .text
 main:
@@ -11,11 +11,7 @@ addi $s0, $zero, 0    	# Initialize $s0
 
 li $v0, 8 							# Read in hexadecimal number
 la $a0, str
-li $a1, 36							# of size 36 bits
-syscall
-
-li $v0, 4								# Print string in $a0
-la $a0, str
+li $a1, 9							# of size 36 bits
 syscall
 
 la $s1, str
@@ -81,8 +77,31 @@ j loop
 
 finish:
 
-li $v0, 1								# Print integer value
-add $a0, $s0, $zero			# in $s0
+#li $v0, 1								# Print integer value
+#add $a0, $s0, $zero			# in $s0
+#syscall
+
+la $s3, buffer
+addi $t7, $zero, 0
+sb $t7, 8($s3)					# Null terminate the buffer string
+
+addi $s3, $s3, 8
+
+stringloop: addi $t6, $zero, 1
+sub $s3, $s3, $t6
+addi $t6, $zero, 10
+divu $s0, $t6					# Divide the decimal in $s0 by 10
+mfhi $t7							# Put the remainder in $t7
+mflo $s0							# Put the quotient in $s0
+addi $t7, $t7, 48 		# Convert decimal in $t7 to ascii
+sb $t7, 0($s3)   			# store character at $s3
+
+bne $s0, $zero, stringloop
+
+finalexit: 
+
+li $v0, 4  						# Print string
+la $a0, 0($s3)
 syscall
 
 li $v0, 10 							# Exit Program
